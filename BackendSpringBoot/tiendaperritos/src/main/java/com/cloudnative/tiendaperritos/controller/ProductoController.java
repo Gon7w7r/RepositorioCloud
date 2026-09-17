@@ -9,7 +9,7 @@ import com.cloudnative.tiendaperritos.repository.ProductoRepository;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/productos")
+@RequestMapping("/api/data")
 @CrossOrigin
 public class ProductoController {
 

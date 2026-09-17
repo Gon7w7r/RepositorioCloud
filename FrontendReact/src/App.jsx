@@ -12,7 +12,7 @@ import {
   UnauthenticatedTemplate,
 } from "@azure/msal-react";
 
-const API_BASE = `${import.meta.env.VITE_API_BASE_URL}/api/productos`;
+const API_BASE = `${import.meta.env.VITE_API_BASE_URL}/api/data`;
 
 
 function App() {
