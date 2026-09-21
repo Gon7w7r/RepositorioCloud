@@ -28,6 +28,18 @@ function App() {
   const [status, setStatus] = useState("");
   const [statusTipo, setStatusTipo] = useState("ok");
 
+  async function fetchAutenticado(url, options = {}) {
+  const token = await obtenerToken();
+
+  return fetch(url, {
+    ...options,
+    headers: {
+      ...options.headers,
+      Authorization: `Bearer ${token}`,
+    },
+  });
+}
+
   function setStatusMessage(mensaje, tipo = "ok") {
     setStatus(mensaje);
     setStatusTipo(tipo);
@@ -41,6 +53,7 @@ function App() {
 
     return response.accessToken;
   }
+
 
     async function cargarProductos() {
   try {
@@ -125,25 +138,18 @@ function App() {
       let res;
 
       if (editandoId !== null) {
-        res = await fetch(
-          `${API_BASE}/${editandoId}`,
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(producto),
-          }
-        );
-      } else {
-        res = await fetch(API_BASE, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(producto),
-        });
-      }
+      res = await fetchAutenticado(`${API_BASE}/${editandoId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(producto),
+      });
+    } else {
+      res = await fetchAutenticado(API_BASE, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(producto),
+      });
+    }
 
       if (!res.ok) {
         const data = await res
@@ -183,9 +189,7 @@ function App() {
 
   async function editarProducto(id) {
     try {
-      const res = await fetch(
-        `${API_BASE}/${id}`
-      );
+      const res = await fetchAutenticado(`${API_BASE}/${id}`);
 
       if (!res.ok) {
         throw new Error(
@@ -218,35 +222,22 @@ function App() {
   }
 
   async function eliminarProducto(id) {
-    try {
-      const res = await fetch(
-        `${API_BASE}/${id}`,
-        {
-          method: "DELETE",
-        }
-      );
+  try {
+    const res = await fetchAutenticado(`${API_BASE}/${id}`, {
+      method: "DELETE",
+    });
 
-      if (!res.ok) {
-        throw new Error(
-          "Error al eliminar producto"
-        );
-      }
-
-      await cargarProductos();
-
-      setStatusMessage(
-        "Producto eliminado correctamente.",
-        "ok"
-      );
-    } catch (error) {
-      console.error(error);
-
-      setStatusMessage(
-        "No se pudo eliminar el producto.",
-        "error"
-      );
+    if (!res.ok) {
+      throw new Error("Error al eliminar producto");
     }
+
+    await cargarProductos();
+    setStatusMessage("Producto eliminado correctamente.", "ok");
+  } catch (error) {
+    console.error(error);
+    setStatusMessage("No se pudo eliminar el producto.", "error");
   }
+}
 
   function confirmarEliminar(id) {
     if (
@@ -351,3 +342,5 @@ function App() {
 }
 
 export default App;
+
+
