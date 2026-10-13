@@ -1,0 +1,40 @@
+services:
+  rabbitmq-1:
+    image: rabbitmq:4-management
+    hostname: rabbitmq-1
+    environment:
+      RABBITMQ_NODENAME: rabbit@rabbitmq-1
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin123
+      RABBITMQ_ERLANG_COOKIE: laboratorio_cookie_compartida
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data_1:/var/lib/rabbitmq
+      - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+    networks: [rabbitmq_cluster]
+
+  rabbitmq-2:
+    image: rabbitmq:4-management
+    hostname: rabbitmq-2
+    environment:
+      RABBITMQ_NODENAME: rabbit@rabbitmq-2
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin123
+      RABBITMQ_ERLANG_COOKIE: laboratorio_cookie_compartida
+    ports:
+      - "5673:5672"
+      - "15673:15672"
+    volumes:
+      - rabbitmq_data_2:/var/lib/rabbitmq
+      - ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+    networks: [rabbitmq_cluster]
+    depends_on: [rabbitmq-1]
+
+volumes:
+  rabbitmq_data_1:
+  rabbitmq_data_2:
+
+networks:
+  rabbitmq_cluster:

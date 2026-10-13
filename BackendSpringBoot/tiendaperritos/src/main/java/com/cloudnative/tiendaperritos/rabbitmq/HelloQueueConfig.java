@@ -11,6 +11,6 @@ public class HelloQueueConfig {
 
     @Bean
     public Queue helloQueue() {
-        return new Queue(HELLO_QUEUE, false);
+        return new Queue(HELLO_QUEUE, true);
     }
 }
