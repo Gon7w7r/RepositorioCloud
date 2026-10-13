@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-TiendaperritosApplication<tiendaperritos>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.cloudnative.tiendaperritos.TiendaperritosApplication",
+            "projectName": "tiendaperritos",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
