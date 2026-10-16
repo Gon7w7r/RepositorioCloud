@@ -5,6 +5,9 @@ import org.springframework.web.bind.annotation.*;
 
 import com.cloudnative.tiendaperritos.entity.Producto;
 import com.cloudnative.tiendaperritos.repository.ProductoRepository;
+import com.cloudnative.tiendaperritos.rabbitmq.eventos.ProductoEventosPublisher;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 
 import java.util.List;
 
@@ -14,11 +17,18 @@ import java.util.List;
 public class ProductoController {
 
    private final ProductoRepository productoRepository;
+   private final ProductoEventosPublisher eventos;
 
-    public ProductoController(ProductoRepository productoRepository) {
-        this.productoRepository = productoRepository;
-    }
-
+    public ProductoController(ProductoRepository productoRepository,
+                          ProductoEventosPublisher eventos) {
+    this.productoRepository = productoRepository;
+    this.eventos = eventos;
+}
+    private String usuarioDe(Jwt jwt) {
+    String usuario = jwt.getClaimAsString("unique_name");
+    if (usuario == null) usuario = jwt.getClaimAsString("preferred_username");
+    return usuario == null ? "desconocido" : usuario;
+}
     @GetMapping
     public List<Producto> obtenerProductos() {
         return productoRepository.findAll();
@@ -33,7 +43,8 @@ public class ProductoController {
     }
 
     @PostMapping
-    public ResponseEntity<?> crearProducto(@RequestBody Producto producto) {
+    public ResponseEntity<?> crearProducto(@RequestBody Producto producto,
+                                       @AuthenticationPrincipal Jwt jwt) {
 
         if (producto.getNombre() == null || producto.getNombre().isBlank()
                 || producto.getPrecio() == null
@@ -44,14 +55,14 @@ public class ProductoController {
         }
 
         Producto nuevoProducto = productoRepository.save(producto);
-
+        eventos.productoCreado(nuevoProducto, usuarioDe(jwt));
         return ResponseEntity.status(201).body(nuevoProducto);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> actualizarProducto(
             @PathVariable Long id,
-            @RequestBody Producto producto) {
+            @RequestBody Producto producto,@AuthenticationPrincipal Jwt jwt) {
 
         if (producto.getNombre() == null || producto.getNombre().isBlank()
                 || producto.getPrecio() == null
@@ -68,9 +79,8 @@ public class ProductoController {
                     productoExistente.setDescripcion(producto.getDescripcion());
                     productoExistente.setPrecio(producto.getPrecio());
                     productoExistente.setStock(producto.getStock());
-
                     Producto actualizado = productoRepository.save(productoExistente);
-
+                    eventos.productoActualizado(actualizado, usuarioDe(jwt));
                     return ResponseEntity.ok(actualizado);
                 })
                 .orElseGet(() ->
@@ -81,14 +91,14 @@ public class ProductoController {
 
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> eliminarProducto(@PathVariable Long id) {
+    public ResponseEntity<?> eliminarProducto(@PathVariable Long id,@AuthenticationPrincipal Jwt jwt) {
 
         if (!productoRepository.existsById(id)) {
             return ResponseEntity.notFound().build();
         }
 
         productoRepository.deleteById(id);
-
+        eventos.productoEliminado(id, usuarioDe(jwt));
         return ResponseEntity.ok(
                 java.util.Map.of("message", "Producto eliminado correctamente.")
         );

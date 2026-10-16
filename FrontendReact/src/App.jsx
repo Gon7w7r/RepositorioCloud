@@ -7,6 +7,8 @@ import ProtectedPage from "./components/ProtectedPage";
 import ProductoTable from "./components/ProductoTable";
 import ProductoForm from "./components/ProductoForm";
 import AuthButtons from "./components/AuthButtons";
+import RabbitAdminPage from "./components/RabbitAdminPage";
+
 import {
   AuthenticatedTemplate,
   UnauthenticatedTemplate,
@@ -288,6 +290,9 @@ function App() {
             <Link to="/protegida">
             <button>Ir a página protegida</button>
             </Link>
+            <Link to="/rabbit-admin">
+              <button>Administrar RabbitMQ</button>
+            </Link>
 
 
           </header>
@@ -337,6 +342,7 @@ function App() {
       path="/protegida"
       element={<ProtectedPage />}
     />
+    <Route path="/rabbit-admin" element={<RabbitAdminPage />} />
   </Routes>
 );
 }

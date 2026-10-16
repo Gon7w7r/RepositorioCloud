@@ -32,6 +32,7 @@ public class SecurityConfig {
                 .requestMatchers(org.springframework.http.HttpMethod.DELETE, "/api/data/**").hasAuthority("Admin")
                 .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/data/**").hasAuthority("Admin")
                 .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/data/**").hasAuthority("Admin")
+                .requestMatchers("/api/rabbit/**").hasAuthority("Admin")
                 .requestMatchers("/api/data/**").hasAuthority("SCOPE_access_as_user")
                 .anyRequest().authenticated()
             )
