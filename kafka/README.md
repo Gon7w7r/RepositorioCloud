@@ -4,18 +4,18 @@ Este módulo reúne la infraestructura y los flujos Kafka adaptados al dominio d
 
 ## Infraestructura
 
-Desde la raíz del repositorio, inicia ZooKeeper, dos brokers y Kafka UI:
+Desde la raíz del repositorio, inicia tres nodos ZooKeeper, tres brokers y Kafka UI:
 
     docker compose -f .\kafka\compose.yaml up -d
     docker compose -f .\kafka\compose.yaml ps
 
-Kafka UI queda en http://localhost:8081. El backend se conecta a los listeners locales localhost:9092 y localhost:9094. Los brokers usan tres particiones y factor de replicación dos para los topics administrados por la aplicación.
+Kafka UI queda en http://localhost:8081. El backend se conecta a los listeners locales localhost:9092, localhost:9094 y localhost:9096. Los topics de eventos y alertas tienen tres particiones y tres réplicas; la DLT tiene tres particiones y dos réplicas.
 
 ## Topics y procesamiento
 
-- tienda.productos.eventos: eventos tipados de producto, con tres particiones, dos réplicas y retención de un día.
-- tienda.productos.alertas-stock: alertas que crea Kafka Streams para productos con menos de cinco unidades.
-- tienda.productos.eventos.DLT: mensajes de producto que no pudieron procesarse después de tres intentos.
+- tienda.productos.eventos: eventos tipados de producto, con tres particiones, tres réplicas y retención de un día.
+- tienda.productos.alertas-stock: alertas para productos con menos de cinco unidades, con tres particiones, tres réplicas y retención de siete días.
+- tienda.productos.eventos.DLT: mensajes de producto que no pudieron procesarse, con tres particiones, dos réplicas y retención de siete días.
 
 Los eventos se publican al crear, actualizar o eliminar productos. El consumidor de auditoría y el flujo Kafka Streams tienen identificadores de aplicación distintos y registran los eventos que procesan.
 

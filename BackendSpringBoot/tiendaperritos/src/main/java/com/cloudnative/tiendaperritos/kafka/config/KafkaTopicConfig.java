@@ -10,7 +10,7 @@ import org.springframework.kafka.config.TopicBuilder;
 public class KafkaTopicConfig {
 
     private static final int PARTITIONS = 3;
-    private static final short REPLICATION_FACTOR = 2;
+    private static final short REPLICATION_FACTOR = 3;
 
     @Bean
     NewTopic productoEventosTopic(
@@ -41,7 +41,7 @@ public class KafkaTopicConfig {
             @Value("${app.kafka.topics.product-events-dlt}") String topic) {
         return TopicBuilder.name(topic)
                 .partitions(PARTITIONS)
-                .replicas(REPLICATION_FACTOR)
+                .replicas((short) 2)
                 .config("cleanup.policy", "delete")
                 .config("retention.ms", "604800000")
                 .build();

@@ -11,6 +11,6 @@ public record CreateKafkaTopicRequest(
         @Pattern(regexp = "[A-Za-z0-9._-]+", message = "El nombre contiene caracteres no permitidos")
         String name,
         @Min(1) @Max(64) int partitions,
-        @Min(1) @Max(2) int replicationFactor,
+        @Min(1) @Max(3) int replicationFactor,
         Map<String, String> configurations) {
 }
