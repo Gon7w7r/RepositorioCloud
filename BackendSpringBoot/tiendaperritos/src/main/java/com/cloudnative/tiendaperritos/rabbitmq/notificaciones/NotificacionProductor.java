@@ -15,7 +15,11 @@ public class NotificacionProductor {
         this.canal = props.notificaciones();
     }
 
+    public void enviar(String evento, NotificacionMensaje mensaje) {
+    rabbitTemplate.convertAndSend(canal.exchange(), canal.routingKey() + "." + evento, mensaje);
+}
+
     public void enviar(NotificacionMensaje mensaje) {
-        rabbitTemplate.convertAndSend(canal.exchange(), canal.routingKey(), mensaje);
+        enviar("manual", mensaje);
     }
 }

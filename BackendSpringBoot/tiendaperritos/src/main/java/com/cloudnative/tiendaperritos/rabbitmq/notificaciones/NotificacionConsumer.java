@@ -42,10 +42,11 @@ public class NotificacionConsumer {
         } catch (ErrorRecuperableException e) {
             Integer intentos = raw.getMessageProperties().getHeader(HEADER_REINTENTOS);
             int actual = intentos == null ? 0 : intentos;
+            String rk = raw.getMessageProperties().getReceivedRoutingKey();
             if (actual < maxReintentos) {
                 log.warn("Fallo recuperable ({}). Reintento {}/{}", e.getMessage(), actual + 1, maxReintentos);
                 channel.basicAck(tag, false);
-                rabbitTemplate.convertAndSend(canal.exchange(), canal.routingKey(), mensaje, m -> {
+                rabbitTemplate.convertAndSend(canal.exchange(), rk, mensaje, m -> {
                     m.getMessageProperties().setHeader(HEADER_REINTENTOS, actual + 1);
                     return m;
                 });
@@ -53,9 +54,6 @@ public class NotificacionConsumer {
                 log.error("Reintentos agotados ({}), enviado a DLQ: {}", maxReintentos, e.getMessage());
                 channel.basicNack(tag, false, false);
             }
-        } catch (Exception e) {
-            log.error("Error inesperado, enviado a DLQ: {}", e.getMessage());
-            channel.basicNack(tag, false, false);
         }
     }
 

@@ -14,8 +14,8 @@ public class NotificacionesRabbitConfig {
     }
 
     @Bean
-    DirectExchange notificacionesExchange() {
-        return new DirectExchange(canal.exchange(), true, false);
+    TopicExchange notificacionesExchange() {
+        return new TopicExchange(canal.exchange(), true, false);
     }
 
     @Bean
@@ -36,11 +36,12 @@ public class NotificacionesRabbitConfig {
         return QueueBuilder.durable(canal.dlq()).build();
     }
 
+    
     @Bean
     Binding notificacionesBinding() {
         return BindingBuilder.bind(notificacionesQueue())
                 .to(notificacionesExchange())
-                .with(canal.routingKey());
+                .with(canal.bindingKey());
     }
 
     @Bean
